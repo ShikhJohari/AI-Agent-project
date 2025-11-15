@@ -25,6 +25,59 @@ All paths you provide should be relative to the working directory. You do not ne
 """
 
 
+def call_function(function_call_part, verbose=False):
+    # Import the actual function implementations
+    from functions.get_file_content import get_file_content
+    from functions.get_files_info import get_files_info
+    from functions.run_python_file import run_python_file
+    from functions.write_file import write_file
+    
+    # Create a mapping of function names to functions
+    function_map = {
+        "get_file_content": get_file_content,
+        "get_files_info": get_files_info,
+        "run_python_file": run_python_file,
+        "write_file": write_file,
+    }
+    
+    function_name = function_call_part.name
+    
+    # Print based on verbose flag
+    if verbose:
+        print(f"Calling function: {function_name}({function_call_part.args})")
+    else:
+        print(f" - Calling function: {function_name}")
+    
+    # Check if function name is valid
+    if function_name not in function_map:
+        return types.Content(
+            role="tool",
+            parts=[
+                types.Part.from_function_response(
+                    name=function_name,
+                    response={"error": f"Unknown function: {function_name}"},
+                )
+            ],
+        )
+    
+    # Add working_directory to args
+    args_dict = dict(function_call_part.args)
+    args_dict["working_directory"] = "./calculator"
+    
+    # Call the function and return result
+    function_result = function_map[function_name](**args_dict)
+    
+    return types.Content(
+        role="tool",
+        parts=[
+            types.Part.from_function_response(
+                name=function_name,
+                response={"result": function_result},
+            )
+        ],
+    )
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Send a prompt to Gemini.")
     parser.add_argument("prompt", nargs="?", help="Prompt to send to the model.")
@@ -58,7 +111,16 @@ def main():
     # Check for function calls
     function_calls = getattr(response.candidates[0].content.parts[0], 'function_call', None)
     if function_calls:
-        print(f"Calling function: {function_calls.name}({dict(function_calls.args)})")
+        function_call_result = call_function(function_calls, verbose=args.verbose)
+        
+        # Validate that the result has the expected structure
+        if not hasattr(function_call_result.parts[0], 'function_response') or \
+           not hasattr(function_call_result.parts[0].function_response, 'response'):
+            raise RuntimeError("Function call result does not have expected structure")
+        
+        # Print the result if verbose
+        if args.verbose:
+            print(f"-> {function_call_result.parts[0].function_response.response}")
     else:
         print(response.text)
 
