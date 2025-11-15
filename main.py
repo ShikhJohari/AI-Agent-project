@@ -100,38 +100,75 @@ def main():
         types.Content(role="user", parts=[types.Part(text=user_prompt)]),
     ]
 
-    response = client.models.generate_content(
-        model="gemini-2.5-flash-lite",
-        contents=messages,
-        config=types.GenerateContentConfig(
-            tools=[available_functions], system_instruction=system_prompt
-        ),
-    )
+    max_iterations = 20
     
-    # Check for function calls
-    function_calls = getattr(response.candidates[0].content.parts[0], 'function_call', None)
-    if function_calls:
-        function_call_result = call_function(function_calls, verbose=args.verbose)
-        
-        # Validate that the result has the expected structure
-        if not hasattr(function_call_result.parts[0], 'function_response') or \
-           not hasattr(function_call_result.parts[0].function_response, 'response'):
-            raise RuntimeError("Function call result does not have expected structure")
-        
-        # Print the result if verbose
-        if args.verbose:
-            print(f"-> {function_call_result.parts[0].function_response.response}")
+    for iteration in range(max_iterations):
+        try:
+            # Generate content with the entire messages list
+            response = client.models.generate_content(
+                model="gemini-2.5-flash-lite",
+                contents=messages,
+                config=types.GenerateContentConfig(
+                    tools=[available_functions], system_instruction=system_prompt
+                ),
+            )
+            
+            # Add all candidates' content to messages
+            for candidate in response.candidates:
+                if candidate.content:
+                    messages.append(candidate.content)
+            
+            # Check if model is finished (no function calls and has text)
+            has_function_call = False
+            has_text = False
+            
+            for candidate in response.candidates:
+                if not candidate.content or not candidate.content.parts:
+                    continue
+                for part in candidate.content.parts:
+                    if hasattr(part, 'function_call') and part.function_call:
+                        has_function_call = True
+                        # Call the function
+                        function_call_result = call_function(part.function_call, verbose=args.verbose)
+                        
+                        # Validate that the result has the expected structure
+                        if not hasattr(function_call_result.parts[0], 'function_response') or \
+                           not hasattr(function_call_result.parts[0].function_response, 'response'):
+                            raise RuntimeError("Function call result does not have expected structure")
+                        
+                        # Print the result if verbose
+                        if args.verbose:
+                            print(f"-> {function_call_result.parts[0].function_response.response}")
+                        
+                        # Add function response to messages with role "user"
+                        messages.append(function_call_result)
+                    
+                    if hasattr(part, 'text') and part.text:
+                        has_text = True
+            
+            # If no function calls and has text, we're done
+            if not has_function_call and has_text:
+                print(response.text)
+                break
+                
+        except Exception as e:
+            print(f"Error during iteration {iteration + 1}: {e}")
+            if args.verbose:
+                import traceback
+                traceback.print_exc()
+            break
     else:
-        print(response.text)
-
-    usage = getattr(response, "usage_metadata", None)
-    prompt_tokens = getattr(usage, "prompt_token_count", "Unknown") if usage else "Unknown"
-    response_tokens = getattr(usage, "candidates_token_count", "Unknown") if usage else "Unknown"
+        # Loop completed without breaking (max iterations reached)
+        print("Warning: Maximum iterations reached without completing the task.")
 
     if args.verbose:
-        print(f"User prompt: {user_prompt}")
-        print(f"Prompt tokens: {prompt_tokens}")
-        print(f"Response tokens: {response_tokens}")
+        print(f"\nUser prompt: {user_prompt}")
+        usage = getattr(response, "usage_metadata", None)
+        if usage:
+            prompt_tokens = getattr(usage, "prompt_token_count", "Unknown")
+            response_tokens = getattr(usage, "candidates_token_count", "Unknown")
+            print(f"Prompt tokens: {prompt_tokens}")
+            print(f"Response tokens: {response_tokens}")
 
 
 if __name__ == "__main__":

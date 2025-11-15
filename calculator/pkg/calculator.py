@@ -8,8 +8,8 @@ class Calculator:
             "/": lambda a, b: a / b,
         }
         self.precedence = {
-            "+": 1,
-            "-": 1,
+            "+": 1,  # Changed precedence for '+' from 3 to 1
+            "-": 1,  # Assuming '-' should also have lower precedence
             "*": 2,
             "/": 2,
         }
