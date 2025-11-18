@@ -72,17 +72,17 @@ schema_write_file = types.FunctionDeclaration(
 
 schema_find_files = types.FunctionDeclaration(
     name="find_files",
-    description="Search for files in the project by exact filename or pattern. Use this when you don't know the full path to a file. Returns matching file paths that can be used with other functions.",
+    description="Search for files in the project by exact filename or pattern. USE THIS PROACTIVELY when the user mentions a file without a full path! Case-insensitive search with smart fallback. Returns matching file paths sorted by relevance that can be used with other functions.",
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
             "filename": types.Schema(
                 type=types.Type.STRING,
-                description="Exact filename to search for (e.g., 'config.py', 'main.py', 'calculator.py'). Use this when you know the exact name.",
+                description="Exact filename to search for (case-insensitive, e.g., 'readme.md', 'Config.py', 'MAIN.PY'). Automatically tries pattern search if exact match fails.",
             ),
             "pattern": types.Schema(
                 type=types.Type.STRING,
-                description="Pattern to search for in filenames (e.g., 'test', 'util', '.py'). Use this for broader searches.",
+                description="Pattern to search for in filenames (case-insensitive substring match, e.g., 'test', 'util', 'config', 'readme'). Use this for broader searches.",
             ),
         },
     ),

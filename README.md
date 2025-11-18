@@ -92,15 +92,27 @@ The agent maintains conversation history across function calls, allowing it to:
 
 ## ✨ Features
 
+### 🎯 Smart File Discovery (NEW!)
+- **Automatic file finding** - No need to specify full paths!
+- **Case-insensitive search** - "readme.md", "README.MD", "Readme.md" all work
+- **Pattern matching** - Find files by partial names or extensions
+- **Intelligent fallback** - Automatically searches when exact matches fail
+- **Nested file detection** - Finds files in any subdirectory
+- **Sorted by relevance** - Most relevant files appear first
+
+**Example:** Just say "show me config.py" and the agent will find it anywhere in your project, no matter where it's located!
+
 ### 🔍 Code Analysis
 - List all files and directories with sizes
 - Read file contents (with truncation for large files)
 - Understand code structure and dependencies
+- Search for files by exact name or pattern
 
 ### ✍️ Code Modification
 - Create new files
 - Modify existing files
 - Write entire modules or functions
+- Auto-locate files before writing
 
 ### ▶️ Code Execution
 - Run Python scripts
@@ -202,6 +214,21 @@ python main.py "<your prompt>" --verbose
 
 ### Example Commands
 
+**🎯 Smart File Finding (No paths needed!):**
+```bash
+# Agent automatically finds README.md anywhere in your project
+python main.py "show me my readme file"
+
+# Finds config.py even with different case
+python main.py "read CONFIG.PY"
+
+# Finds nested files automatically
+python main.py "show me calculator.py"
+
+# Pattern matching for multiple files
+python main.py "list all test files"
+```
+
 **List files:**
 ```bash
 python main.py "What files are in my project?"
@@ -256,7 +283,31 @@ Lists files and directories with metadata.
 - tests.py: file_size=1256 bytes, is_dir=False
 ```
 
-### 2. `get_file_content`
+### 2. `find_files` ⭐ NEW!
+
+Intelligently searches for files in the project by name or pattern.
+
+**Parameters:**
+- `filename` (optional): Exact filename to search for (case-insensitive)
+- `pattern` (optional): Pattern to search for in filenames (case-insensitive)
+
+**Returns:**
+- List of matching file paths sorted by relevance
+
+**Features:**
+- **Case-insensitive matching** - "readme.md" matches "README.md"
+- **Smart fallback** - If exact match fails, tries pattern search
+- **Nested file detection** - Searches entire project tree
+- **Relevance sorting** - Shorter paths appear first
+- **Ignores common directories** - Skips `__pycache__`, `.git`, `node_modules`, etc.
+
+**Example:**
+```
+Found 1 file(s):
+  - README.md
+```
+
+### 3. `get_file_content`
 
 Reads and returns file contents.
 
@@ -270,8 +321,9 @@ Reads and returns file contents.
 - UTF-8 encoding
 - Automatic truncation warning
 - Error handling for missing files
+- **Auto-search fallback** - If path not found, automatically searches for the file
 
-### 3. `run_python_file`
+### 4. `run_python_file`
 
 Executes a Python script and captures output.
 
@@ -287,7 +339,7 @@ Executes a Python script and captures output.
 - Working directory set to sandbox
 - Non-.py files rejected
 
-### 4. `write_file`
+### 5. `write_file`
 
 Creates or overwrites a file with content.
 
@@ -302,6 +354,7 @@ Creates or overwrites a file with content.
 - Creates parent directories automatically
 - UTF-8 encoding
 - Overwrites existing files without warning
+- **Auto-locate files** - If just a filename is provided, searches for existing file first
 
 ## 🔒 Security Features
 
