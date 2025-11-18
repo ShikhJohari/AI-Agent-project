@@ -8,7 +8,7 @@ def write_file(working_directory, file_path, content):
         working_directory = os.path.abspath(working_directory)
         
         if not full_path.startswith(working_directory):
-            return f'Error: Cannot write to "{file_path}" as it is outside the permitted working directory'
+            return f'Error: Cannot write to "{file_path}" as it is outside the project root'
         
         # Create parent directories if they don't exist
         parent_dir = os.path.dirname(full_path)

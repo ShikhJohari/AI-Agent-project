@@ -14,14 +14,16 @@ api_key = os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
 
 system_prompt = """
-You are a helpful AI coding agent.
+You are a helpful AI coding agent with access to a Python codebase.
 When a user asks a question or makes a request, make a function call plan. You can perform the following operations:
 - List files and directories
 - Read file contents
 - Execute Python files with optional arguments
 - Write or overwrite files
 
-All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
+All paths you provide should be relative to the project root directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
+
+The project structure and all files are accessible to you. Be proactive in exploring the codebase to understand its structure before performing operations.
 """
 
 
@@ -60,9 +62,10 @@ def call_function(function_call_part, verbose=False):
             ],
         )
     
-    # Add working_directory to args
+    # Add working_directory to args (project root = where main.py is located)
     args_dict = dict(function_call_part.args)
-    args_dict["working_directory"] = "./calculator"
+    project_root = os.path.dirname(os.path.abspath(__file__))
+    args_dict["working_directory"] = project_root
     
     # Call the function and return result
     function_result = function_map[function_name](**args_dict)
