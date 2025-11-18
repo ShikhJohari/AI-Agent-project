@@ -9,7 +9,7 @@ def get_file_content(working_directory, file_path):
         working_directory = os.path.abspath(working_directory)
         
         if not full_path.startswith(working_directory):
-            return f'Error: Cannot read "{file_path}" as it is outside the permitted working directory'
+            return f'Error: Cannot read "{file_path}" as it is outside the project root'
         
         if not os.path.exists(full_path) or not os.path.isfile(full_path):
             return f'Error: File not found or is not a regular file: "{file_path}"'

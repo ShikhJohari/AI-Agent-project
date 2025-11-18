@@ -10,7 +10,7 @@ def run_python_file(working_directory, file_path, args=[]):
         
         # Check if file_path is outside working_directory
         if not full_path.startswith(working_directory):
-            return f'Error: Cannot execute "{file_path}" as it is outside the permitted working directory'
+            return f'Error: Cannot execute "{file_path}" as it is outside the project root'
         
         # Check if file exists
         if not os.path.exists(full_path):

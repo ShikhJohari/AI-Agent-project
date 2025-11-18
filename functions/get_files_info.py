@@ -4,13 +4,13 @@ from google.genai import types
 
 schema_get_files_info = types.FunctionDeclaration(
     name="get_files_info",
-    description="Lists files in the specified directory along with their sizes, constrained to the working directory.",
+    description="Lists files in the specified directory along with their sizes. Works anywhere in the project.",
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
             "directory": types.Schema(
                 type=types.Type.STRING,
-                description="The directory to list files from, relative to the working directory. If not provided, lists files in the working directory itself.",
+                description="The directory to list files from, relative to the project root (e.g., '.', 'calculator', 'functions', 'calculator/pkg'). If not provided, lists files in the project root.",
             ),
         },
     ),
@@ -18,13 +18,13 @@ schema_get_files_info = types.FunctionDeclaration(
 
 schema_get_file_content = types.FunctionDeclaration(
     name="get_file_content",
-    description="Reads and returns the contents of a file, constrained to the working directory.",
+    description="Reads and returns the contents of a file anywhere in the project.",
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
             "file_path": types.Schema(
                 type=types.Type.STRING,
-                description="The path to the file to read, relative to the working directory.",
+                description="The path to the file to read, relative to the project root (e.g., 'main.py', 'calculator/main.py', 'functions/config.py').",
             ),
         },
         required=["file_path"],
@@ -33,13 +33,13 @@ schema_get_file_content = types.FunctionDeclaration(
 
 schema_run_python_file = types.FunctionDeclaration(
     name="run_python_file",
-    description="Executes a Python file with optional command-line arguments, constrained to the working directory.",
+    description="Executes a Python file with optional command-line arguments. Can run any .py file in the project.",
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
             "file_path": types.Schema(
                 type=types.Type.STRING,
-                description="The path to the Python file to execute, relative to the working directory.",
+                description="The path to the Python file to execute, relative to the project root (e.g., 'tests.py', 'calculator/main.py', 'calculator/tests.py').",
             ),
             "args": types.Schema(
                 type=types.Type.ARRAY,
@@ -53,13 +53,13 @@ schema_run_python_file = types.FunctionDeclaration(
 
 schema_write_file = types.FunctionDeclaration(
     name="write_file",
-    description="Writes or overwrites content to a file, constrained to the working directory. Creates the file if it doesn't exist.",
+    description="Writes or overwrites content to a file anywhere in the project. Creates the file and parent directories if they don't exist.",
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
             "file_path": types.Schema(
                 type=types.Type.STRING,
-                description="The path to the file to write, relative to the working directory.",
+                description="The path to the file to write, relative to the project root (e.g., 'newfile.py', 'calculator/utils.py', 'functions/helper.py').",
             ),
             "content": types.Schema(
                 type=types.Type.STRING,
@@ -87,7 +87,7 @@ def get_files_info(working_directory, directory="."):
         working_directory = os.path.abspath(working_directory)
         
         if not full_path.startswith(working_directory):
-            return f'Error: Cannot list "{directory}" as it is outside the permitted working directory'
+            return f'Error: Cannot list "{directory}" as it is outside the project root'
         
         if not os.path.exists(full_path):
             return f'Error: "{directory}" does not exist'
