@@ -70,12 +70,31 @@ schema_write_file = types.FunctionDeclaration(
     ),
 )
 
+schema_find_files = types.FunctionDeclaration(
+    name="find_files",
+    description="Search for files in the project by exact filename or pattern. Use this when you don't know the full path to a file. Returns matching file paths that can be used with other functions.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "filename": types.Schema(
+                type=types.Type.STRING,
+                description="Exact filename to search for (e.g., 'config.py', 'main.py', 'calculator.py'). Use this when you know the exact name.",
+            ),
+            "pattern": types.Schema(
+                type=types.Type.STRING,
+                description="Pattern to search for in filenames (e.g., 'test', 'util', '.py'). Use this for broader searches.",
+            ),
+        },
+    ),
+)
+
 available_functions = types.Tool(
     function_declarations=[
         schema_get_files_info,
         schema_get_file_content,
         schema_run_python_file,
         schema_write_file,
+        schema_find_files,
     ]
 )
 

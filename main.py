@@ -17,13 +17,19 @@ system_prompt = """
 You are a helpful AI coding agent with access to a Python codebase.
 When a user asks a question or makes a request, make a function call plan. You can perform the following operations:
 - List files and directories
+- Search for files by name or pattern
 - Read file contents
 - Execute Python files with optional arguments
 - Write or overwrite files
 
 All paths you provide should be relative to the project root directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
 
-The project structure and all files are accessible to you. Be proactive in exploring the codebase to understand its structure before performing operations.
+IMPORTANT: When a user asks about a file without providing the full path (e.g., "read config.py"), you should:
+1. First use find_files to locate the file by its exact name
+2. Then use the full path returned by find_files to access the file
+3. If multiple matches are found, read the most relevant one or ask for clarification
+
+Be proactive and intelligent - don't fail just because the user didn't provide the full path. Search for files automatically!
 """
 
 
@@ -33,6 +39,7 @@ def call_function(function_call_part, verbose=False):
     from functions.get_files_info import get_files_info
     from functions.run_python_file import run_python_file
     from functions.write_file import write_file
+    from functions.find_files import find_files
     
     # Create a mapping of function names to functions
     function_map = {
@@ -40,6 +47,7 @@ def call_function(function_call_part, verbose=False):
         "get_files_info": get_files_info,
         "run_python_file": run_python_file,
         "write_file": write_file,
+        "find_files": find_files,
     }
     
     function_name = function_call_part.name
