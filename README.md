@@ -28,6 +28,8 @@ This AI agent is designed to be a helpful coding assistant that can understand n
 - **Execute** Python scripts with custom arguments
 - **Analyze** code structure and provide insights
 
+**NEW: Beautiful Interactive Mode!** 🎨 Just run `./agent` to start a continuous conversation with your AI assistant. No more typing long commands—enjoy a smooth, colorful, context-aware experience.
+
 All operations are constrained to a predefined working directory for security, making it safe to use in production environments.
 
 ## 🏗️ Architecture
@@ -92,7 +94,19 @@ The agent maintains conversation history across function calls, allowing it to:
 
 ## ✨ Features
 
-### 🎯 Smart File Discovery (NEW!)
+### 🎨 Interactive CLI Mode (NEW!)
+- **Beautiful terminal UI** - Rich colors, panels, and formatted output
+- **Time-aware greeting** - Good morning/afternoon/evening based on your time
+- **Continuous conversation** - Ask multiple questions in one session
+- **Context preservation** - Maintains full conversation history using the model's context window
+- **Smart prompts** - Clear "Enter prompt here:" message for easy interaction
+- **Special commands** - clear, reset, verbose, exit
+- **Graceful exit** - Multiple exit options (exit, quit, q, Ctrl+C)
+- **Zero friction** - Just type `./agent` and start coding!
+
+**Example:** Run `./agent` once and have a natural conversation with your AI assistant!
+
+### 🎯 Smart File Discovery
 - **Automatic file finding** - No need to specify full paths!
 - **Case-insensitive search** - "readme.md", "README.MD", "Readme.md" all work
 - **Pattern matching** - Find files by partial names or extensions
@@ -145,9 +159,9 @@ cd AI-Agent-project
 2. **Install dependencies:**
 ```bash
 # Using pip
-pip install google-genai==1.12.1 python-dotenv==1.1.0
+pip install google-genai==1.12.1 python-dotenv==1.1.0 rich>=13.7.0
 
-# Or using uv (if available)
+# Or using uv (recommended - automatically installs all dependencies)
 uv sync
 ```
 
@@ -155,6 +169,28 @@ uv sync
 Create a `.env` file in the project root:
 ```bash
 GEMINI_API_KEY=your_api_key_here
+```
+
+4. **Make the agent launcher executable (optional but recommended):**
+```bash
+chmod +x agent
+```
+
+Now you can start the interactive agent with just:
+```bash
+./agent
+```
+
+**Optional: Add to PATH for system-wide access:**
+```bash
+# Add to your ~/.bashrc or ~/.zshrc
+export PATH="$PATH:/path/to/AI-Agent-project"
+
+# Or create a symlink
+sudo ln -s /path/to/AI-Agent-project/agent /usr/local/bin/agent
+
+# Then use it from anywhere:
+agent
 ```
 
 To get a Gemini API key:
@@ -198,7 +234,79 @@ model="gemini-2.5-flash-lite"  # or gemini-2.0-flash, gemini-1.5-pro, etc.
 
 ## 🚀 Usage
 
-### Basic Syntax
+### Interactive Mode (Recommended!) ⭐
+
+The easiest way to use the agent is through the beautiful interactive CLI:
+
+```bash
+./agent
+```
+
+Or alternatively:
+
+```bash
+python main.py
+```
+
+**Features:**
+- **Time-based greeting** - Good morning/afternoon/evening based on your local time
+- **Continuous conversation** - Ask multiple questions without restarting
+- **Context preservation** - Maintains full conversation history
+- **Beautiful UI** - Colored output, panels, and markdown rendering
+- **Smart prompts** - Clear "Enter prompt here:" message
+- **Exit commands** - Type `exit`, `quit`, `q`, or press `Ctrl+C`
+
+**Special commands in interactive mode:**
+- `clear` - Clear screen and show welcome again
+- `reset` - Clear conversation context and start fresh
+- `verbose` - Toggle detailed function call information
+- `exit`, `quit`, `q` - Exit the interactive session
+
+**Example session:**
+```
+$ ./agent
+
+╭──────────────────────────────────────────────────────────╮
+│                                                          │
+│  Good morning! Welcome to the AI Coding Agent 🤖         │
+│                                                          │
+│  I'm your intelligent coding assistant. I can:           │
+│    • Find and read files automatically                   │
+│    • Write and modify code                               │
+│    • Run Python scripts                                  │
+│    • Debug and refactor code                             │
+│                                                          │
+│  Type exit, quit, or q to leave. Press Ctrl+C anytime.   │
+│                                                          │
+╰──────────────────────────────────────────────────────────╯
+
+Enter prompt here: show me my readme file
+  • find_files
+  • get_file_content
+
+╭──────────────────────────────────────────────────────────╮
+│                                                          │
+│  [Response with README contents displayed beautifully]   │
+│                                                          │
+╰──────────────────────────────────────────────────────────╯
+
+Enter prompt here: what tests do we have?
+  • find_files
+
+╭──────────────────────────────────────────────────────────╮
+│                                                          │
+│  [Lists test files found in the project]                 │
+│                                                          │
+╰──────────────────────────────────────────────────────────╯
+
+Enter prompt here: exit
+
+Goodbye! Happy coding! 👋
+```
+
+### Single-Command Mode
+
+For quick one-off queries, use the original single-command syntax:
 
 ```bash
 python main.py "<your prompt>"

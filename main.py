@@ -116,9 +116,15 @@ def parse_args() -> argparse.Namespace:
 def main():
     args = parse_args()
 
+    # If no prompt provided, launch interactive CLI
     if not args.prompt:
-        print("Error: prompt argument required.")
-        sys.exit(1)
+        try:
+            from interactive_cli import interactive_loop
+            interactive_loop()
+            return
+        except ImportError as e:
+            print(f"Error: Could not load interactive CLI: {e}")
+            sys.exit(1)
 
     user_prompt = args.prompt
 
