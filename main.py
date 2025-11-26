@@ -138,7 +138,7 @@ def main():
         try:
             # Generate content with the entire messages list
             response = client.models.generate_content(
-                model="gemini-2.5-flash-lite",
+                model="gemini-3-pro",
                 contents=messages,
                 config=types.GenerateContentConfig(
                     tools=[available_functions], system_instruction=system_prompt
