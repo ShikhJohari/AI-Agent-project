@@ -1,6 +1,6 @@
 # Kodex
 
-A powerful AI coding assistant powered by Google's Gemini 2.5 Flash that can interact with your codebase through function calling. The agent operates in a sandboxed environment, allowing it to safely read, write, execute, and analyze code within a specified working directory.
+A powerful AI coding assistant powered by Google's Gemini 3 pro that can interact with your codebase through function calling. The agent operates in a sandboxed environment, allowing it to safely read, write, execute, and analyze code within a specified working directory.
 
 ## 📋 Table of Contents
 
