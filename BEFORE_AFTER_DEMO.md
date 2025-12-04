@@ -130,14 +130,14 @@ You can now use this agent on **ANY** project with confidence:
 
 ```bash
 # Clone and setup
-git clone <repo-url>
+gt clone <repo-url>
 cd AI-Agent-project
 uv sync
 
 # Use it naturally - no need to memorize paths!
 uv run python main.py "show me my config file"
 uv run python main.py "find test files"
-uv run python main.py "read the main module"
+uv run python main.py "read the imain module"
 uv run python main.py "show me the database schema"
 ```
 
